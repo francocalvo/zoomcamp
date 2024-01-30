@@ -17,14 +17,15 @@ classifiers = [
     "Typing :: Typed",
 ]
 packages = [
-    { include = "zoomcamp", from = "src" },
+    { include = "m1_module", from = "src" },
 ]
 
 [tool.poetry.scripts]
-zoomcamp = "zoomcamp._main:main"
+m1_module = "m1_module._main:main"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+polars = "^0.20.6"
 
 [tool.black]
 line-length = 88
