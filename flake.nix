@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-23.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     # flake-utils
     systems.url = "github:nix-systems/x86_64-linux";
@@ -17,15 +17,20 @@
   outputs = { self, nixpkgs, systems, flake-utils, poetry2nix }:
     flake-utils.lib.eachDefaultSystem (system:
       let
+        inherit (poetry2nix.lib.mkPoetry2Nix { inherit pkgs; })
+          mkPoetryApplication;
+
         pkgs = import nixpkgs {
           inherit system;
           config.allowUnfree = true; # Propietary software
         };
+
         python = pkgs.python311;
-        app = pkgs.poetry2nix.mkPoetryApplication {
+
+        app = mkPoetryApplication {
           inherit python;
           preferWheels = true;
-          projectDir = ./.;
+          projectDir = self;
         };
       in {
         packages = let
@@ -48,7 +53,10 @@
               paths = [ app ];
             };
 
-            config = { Entrypoint = [ "m1_module" ]; };
+            config = {
+              # Entrypoint = [ "${pkgs.bash}/bin/bash" ];
+              Entrypoint = [ "m1_module" "--type=postgres" ];
+            };
           };
 
         in {
@@ -63,13 +71,36 @@
               engage
               nixpkgs-fmt
               poetry
-              pyright
               ruff
               docker
               cargo
+              wget
+
+              # Dependencies
+              libpqxx
+              postgresql
             ]) ++ (with pkgs.nodePackages; [ markdownlint-cli ]);
 
           NIX_PYTHON_SITE_PACKAGES = python.sitePackages;
+
+          # export LD_LIBRARY_PATH=${pkgs.stdenv.cc.cc.lib}/lib/
+          # export LD_LIBRARY_PATH="${
+          #   pkgs.lib.makeLibraryPath [
+          #     # pkgs.zlib
+          #     # pkgs.glibc
+          #     pkgs.pythonManylinuxPackages.manylinux2014Package
+          #   ]
+          # }:$LD_LIBRARY_PATH"
+          shellHook = ''
+            export LD_LIBRARY_PATH="${
+              pkgs.lib.makeLibraryPath [
+                # pkgs.iconv
+                # pkgs.glibc
+                pkgs.pythonManylinuxPackages.manylinux2014Package
+              ]
+            }"
+
+          '';
         };
 
         checks = {

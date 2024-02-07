@@ -26,6 +26,10 @@ m1_module = "m1_module._main:main"
 [tool.poetry.dependencies]
 python = "^3.11"
 polars = "^0.20.6"
+sqlalchemy = "^2.0.25"
+pandas = "^2.2.0"
+pyarrow = "^15.0.0"
+psycopg2-binary = "^2.9.9"
 
 [tool.black]
 line-length = 88
@@ -37,7 +41,7 @@ exclude = [
 ]
 typeCheckingMode = "strict"
 useLibraryCodeForTypes = true
-reportMissingTypeStubs = false
+reportMissingTypeStubs = true
 
 [tool.ruff]
 select = [ "ALL" ]
@@ -73,9 +77,6 @@ ignore = [
 
     # Just use a recent version of Python
     "FA",
-
-    # This would just discourage documenting deficiences, not committing them
-    "FIX",
 
     # Type-checkers interpret redundant `as` as exporting an item
     "PLC0414",

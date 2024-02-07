@@ -10,3 +10,7 @@
 
 # Nix artifacts
 /result
+
+# Project artifacts
+/temp
+output.csv.gz

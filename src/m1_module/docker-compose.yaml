@@ -1,0 +1,58 @@
+---
+version: "3.9"
+
+networks:
+  network1:
+    name: my-network
+    attachable: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.22.0.0/16
+          ip_range: 172.22.5.0/24
+          gateway: 172.22.0.1
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ny_taxi
+    volumes:
+      - ../../temp/postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: no
+    ports:
+      - "5432:5432"
+    # Allow localhost connections
+    networks:
+      - network1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  ingest:
+    image: zc-images:m1
+    environment:
+      PG_USER: "postgres"
+      PG_PASSWORD: "postgres"
+      PG_DB: "ny_taxi"
+      PG_HOST: "postgres"
+    networks:
+      - network1
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=root
+    ports:
+      - "8080:80"
+    networks:
+      - network1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
