@@ -65,32 +65,34 @@
         };
 
         devShells.default = pkgs.mkShell {
-          nativeBuildInputs = [ python ]
-            ++ (with python.pkgs; [ black pip pytest pytest-cov ])
-            ++ (with pkgs; [
-              engage
-              nixpkgs-fmt
-              poetry
-              ruff
-              docker
-              cargo
-              wget
+          nativeBuildInputs = [ python ] ++ (with python.pkgs; [
+            # Python dependencies
+            black
+            pip
+            pytest
+            pytest-cov
+          ]) ++ (with pkgs; [
+            # Dev dependencies
+            engage
+            nixpkgs-fmt
+            poetry
+            ruff
+            docker
+            cargo
+            wget
 
-              # Dependencies
-              libpqxx
-              postgresql
-            ]) ++ (with pkgs.nodePackages; [ markdownlint-cli ]);
+            # Zoomcamp dependencies
+            libpqxx
+            postgresql
+            terraform
+            google-cloud-sdk
+          ]) ++ (with pkgs.nodePackages;
+            [ # NodeJS dependencies
+              markdownlint-cli
+            ]);
 
           NIX_PYTHON_SITE_PACKAGES = python.sitePackages;
 
-          # export LD_LIBRARY_PATH=${pkgs.stdenv.cc.cc.lib}/lib/
-          # export LD_LIBRARY_PATH="${
-          #   pkgs.lib.makeLibraryPath [
-          #     # pkgs.zlib
-          #     # pkgs.glibc
-          #     pkgs.pythonManylinuxPackages.manylinux2014Package
-          #   ]
-          # }:$LD_LIBRARY_PATH"
           shellHook = ''
             export LD_LIBRARY_PATH="${
               pkgs.lib.makeLibraryPath [
@@ -99,7 +101,6 @@
                 pkgs.pythonManylinuxPackages.manylinux2014Package
               ]
             }"
-
           '';
         };
 
