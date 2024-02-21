@@ -80,6 +80,7 @@
             docker
             cargo
             wget
+            lunarvim
 
             # Zoomcamp dependencies
             libpqxx
