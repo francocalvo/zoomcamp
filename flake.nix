@@ -85,6 +85,7 @@
             libpqxx
             postgresql
             terraform
+            docker
             google-cloud-sdk
           ]) ++ (with pkgs.nodePackages;
             [ # NodeJS dependencies
@@ -95,12 +96,10 @@
 
           shellHook = ''
             export LD_LIBRARY_PATH="${
-              pkgs.lib.makeLibraryPath [
-                # pkgs.iconv
-                # pkgs.glibc
-                pkgs.pythonManylinuxPackages.manylinux2014Package
-              ]
-            }"
+              pkgs.lib.makeLibraryPath [ pkgs.zlib ]
+            }:$LD_LIBRARY_PATH"
+
+            export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:$LD_LIBRARY_PATH"
           '';
         };
 
