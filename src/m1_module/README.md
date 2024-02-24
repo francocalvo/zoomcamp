@@ -32,3 +32,10 @@
 - This _works_ in 23.05. If I update I start getting a mismatch between GLIB
   needed and available, so I'll have to make do. I think I didn't come across
   this problem now because I'm not using Numpy/Pandas directly?
+
+### Google Cloud
+
+- I'm creating a shell for the VM that strips unused things. I need to call it
+  using `nix develop .#vm`.
+    - I need to follow official way to install docker as I need the root for the
+      deamonopu

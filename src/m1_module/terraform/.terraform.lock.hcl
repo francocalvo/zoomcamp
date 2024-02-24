@@ -1,0 +1,41 @@
+# This file is maintained automatically by "terraform init".
+# Manual edits may be lost in future updates.
+
+provider "registry.terraform.io/hashicorp/external" {
+  version = "2.3.3"
+  hashes = [
+    "h1:H+3QlVPs/7CDa3I4KU/a23wYeGeJxeBlgvR7bfK1t1w=",
+    "zh:03d81462f9578ec91ce8e26f887e34151eda0e100f57e9772dbea86363588239",
+    "zh:37ec2a20f6a3ec3a0fd95d3f3de26da6cb9534b30488bc45723e118a0911c0d8",
+    "zh:4eb5b119179539f2749ce9de0e1b9629d025990f062f4f4dddc161562bb89d37",
+    "zh:5a31bb58414f41bee5e09b939012df5b88654120b0238a89dfd6691ba197619a",
+    "zh:6221a05e52a6a2d4f520ffe7cbc741f4f6080e0855061b0ed54e8be4a84eb9b7",
+    "zh:78d5eefdd9e494defcb3c68d282b8f96630502cac21d1ea161f53cfe9bb483b3",
+    "zh:8bb068496b4679bef625e4710d9f3432e301c3a56602271f04e60eadf7f8a94c",
+    "zh:94742aa5378bab626ce34f79bcef6a373e4f86ea7a8b762e9f71270a899e0d00",
+    "zh:a485831b5a525cd8f40e8982fa37da40ff70b1ae092c8b755fcde123f0b1238d",
+    "zh:a647ff16d071eabcabd87ea8183eb90a775a0294ddd735d742075d62fff09193",
+    "zh:b74710c5954aaa3faf262c18d36a8c2407862d9f842c63e7fa92fa4de3d29df6",
+    "zh:fa73d83edc92af2e551857594c2232ba6a9e3603ad34b0a5940865202c08d8d7",
+  ]
+}
+
+provider "registry.terraform.io/hashicorp/google" {
+  version     = "5.17.0"
+  constraints = "5.17.0"
+  hashes = [
+    "h1:9DKCaGp9EFKDLWIOWI3yA/RgWTMh0EMD6+iggVXC9l0=",
+    "zh:31b4d485ee66e6ff2eb1d8e476e694904447ce2b7143a2e067e4b80a84958d13",
+    "zh:32e86a51c4b0b29b7a18dd95616ea2976f08a4a7385e00f2bcab266217ee4320",
+    "zh:357f352bf04e7bc10d61d49296bf6503f31a3db0500169cb532afde7d318643e",
+    "zh:4b4637ca397cc771136edf7ec5578b5ab8631a8955a86d4fce3b8c40ca8c26b4",
+    "zh:4fe198b7427f7bf04270a5491a0352379c2b0a1caf12e206e6e224ceb085f56a",
+    "zh:7abb8509a61602d5ed4c801e7cd7c8299d109bc07980352251ba79880a99abab",
+    "zh:b1550fe08c650d8419860da1568d3f77093d269f880cad7d720d843b2a9ec545",
+    "zh:c91d7079646a3fdbb927085e368a16b221a23c17cf7455d5088f0c8f5da48c9f",
+    "zh:d367213a5f392852ef0708283df583703b2efd0b44f9e599cd055086c371cf74",
+    "zh:d5b557f294f4094a865afaa0611dc2e657d485b60903f12795eeedc2e1c3aa87",
+    "zh:f569b65999264a9416862bca5cd2a6177d94ccb0424f3a4ef424428912b9cb3c",
+    "zh:fdad54c5e50751cef3f39a8666ff6adbb3bd860d396d5a9a0a3526e204f60454",
+  ]
+}
