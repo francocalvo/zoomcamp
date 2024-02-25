@@ -18,17 +18,6 @@ virtualization, permissions, editing tools and more are not handled here.
 
 - [Module 1: Intro to Docker and Terraform](./src/m1_module/README.md)
 
-## VM Connection
+## Extras
 
-Use the following command:
-
-```
-gcloud compute ssh --zone "southamerica-west1-b" "zc--base-vm" --project "zc-gcp-2024"
-```
-
-Also, in the first boot, run this from [#3962](https://github.com/alacritty/alacritty/issues/3962) to improve terminal
-compatibility.
-
-```
-curl -sSL https://raw.githubusercontent.com/alacritty/alacritty/master/extra/alacritty.info | tic -x -
-```
+- [Nix, NixOS and reproducibility](./nix/README.md)
