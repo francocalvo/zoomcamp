@@ -21,7 +21,7 @@ let
   };
 
 in {
-  hostname = "35.209.152.208";
+  hostname = "35.208.188.66";
   remoteBuild = true;
   profiles.system = {
     user = "root";

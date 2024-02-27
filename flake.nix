@@ -34,7 +34,8 @@
     in {
 
       deploy.nodes = {
-        vm = import ./nix/deploy.nix { inherit nixpkgs pkgs deploy-rs system; };
+        vm =
+          import ./nix/provisioning { inherit nixpkgs pkgs deploy-rs system; };
       };
 
       packages.${system} = {
