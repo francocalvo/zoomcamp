@@ -35,7 +35,18 @@
 
 ### Google Cloud
 
-- I'm creating a shell for the VM that strips unused things. I need to call it
-  using `nix develop .#vm`.
-    - I need to follow official way to install docker as I need the root for the
-      deamonopu
+- I'm creating a GCE Image using the flake found in `nixpkgs`. I can build it
+  using
+  ````
+  nix build --no-link ".#nixosConfigurations.vm.config.system.build.googleComputeImage" -o gce ```
+  ````
+- I'm deploying the configuration using `deploy-rs`, using as base nixosSystem
+  from nixpkgs for GCE images (same as the flake for the build).
+- I'm deploying the OCI-Image using the native module from NixOS.
+- The command to forward ports is
+  `ssh -L 5432:localhost:5432 REMOTE_USER@REMOTE_IP`
+- There is more information in
+  [Nix, NixOS and reproducibility](../../nix/README.md), but in conclusion, I
+  get the full system using Nix and deploying with two commands
+  (terraform+deploy). I can connect to Postgres using pgcli, and the same with
+  the ingestion script.
