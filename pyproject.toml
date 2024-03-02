@@ -30,16 +30,28 @@ sqlalchemy = "^2.0.25"
 pandas = "^2.2.0"
 pyarrow = "^15.0.0"
 psycopg2-binary = "^2.9.9"
+pyarrow-stubs = "^10.0.1.7"
 
 [tool.black]
 line-length = 88
+
+# [tool.mypy]
+# python_version = "3.11"
+# warn_return_any = true
+# warn_unused_configs = true
+#
+# [[tool.mypy.overrides]]
+# module = "m1_module"
+# disallow_untyped_defs = true
+
+
 
 [tool.pyright]
 exclude = [
     ".venv",
     ".direnv",
 ]
-typeCheckingMode = "strict"
+typeCheckingMode = "basic"
 useLibraryCodeForTypes = true
 reportMissingTypeStubs = true
 

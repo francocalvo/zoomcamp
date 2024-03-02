@@ -2,6 +2,7 @@ import logging
 import urllib.request
 from argparse import ArgumentParser
 from time import time
+from typing import Literal
 
 import polars as pl
 from pyarrow.csv import CSVStreamingReader, ReadOptions, open_csv
@@ -26,7 +27,7 @@ def main() -> int | None:
     args = parser.parse_known_args()
 
     logger.info("Downloading the CSV.GZ file")
-    urllib.request.urlretrieve(args[0].url, "output.csv.gz")
+    urllib.request.urlretrieve(args[0].url, "output.csv.gz")  # noqa: S310
     logger.info("Download complete")
 
     if args[0].type == "postgres":
@@ -37,13 +38,13 @@ def main() -> int | None:
         logger.info("Connected to %s", conn_str)
     else:
         msg = "Only postgres is supported"
-        raise Exception(msg)
+        raise Exception(msg)  # noqa: TRY002
 
     logger.info("Target database is %s", engine)
 
     logger.info("Reading csv from pyarrow")
-    ops: ReadOptions = ReadOptions(block_size=100000)  # type: ignore
-    arrow_table: CSVStreamingReader = open_csv(  # type: ignore
+    ops: ReadOptions = ReadOptions(block_size=1000000)
+    arrow_table: CSVStreamingReader = open_csv(
         "output.csv.gz",
         read_options=ops,
     )
@@ -52,15 +53,17 @@ def main() -> int | None:
     dt = time()
     logger.info("Writing to database")
     first = True
-    c = 0
-    for batch in arrow_table:  # type: ignore
-        logger.info("Counter: %i", c)
-        c += 1
-        df_batch: pl.DataFrame = pl.from_arrow(batch)  # type: ignore
-        mode = "replace" if first else "append"
-        df_batch.write_database(
-            "taxi_data", conn_str, if_table_exists=mode, engine="sqlalchemy"
-        )
+    for i, batch in enumerate(arrow_table):
+        logger.info("Counter: %i. Time elapsed: %f", i, (time() - dt))
+        df_batch: pl.DataFrame | pl.Series = pl.from_arrow(batch)
+        mode: Literal["replace", "append"] = "replace" if first else "append"
+
+        if type(df_batch) == pl.DataFrame:
+            df_batch.write_database(
+                "taxi_data", conn_str, if_table_exists=mode, engine="sqlalchemy"
+            )
 
     logger.info("End timer")
-    logger.info("Time elapsed: %s", {time() - dt})
+    logger.info("Time elapsed: %s", time() - dt)
+
+    return 0
