@@ -1,14 +1,17 @@
 import logging
 import urllib.request
-from argparse import ArgumentParser
+from argparse import Namespace
+from datetime import datetime
+from pathlib import Path
 from time import time
 from typing import Literal
 
-import polars as pl
-from pyarrow.csv import CSVStreamingReader, ReadOptions, open_csv
+import pandas as pd
+from dateutil import rrule
 from sqlalchemy import Engine
 
-from m1_module.pg_conn import PostgresEngineCreator
+from m1_module.parser import create_parser
+from m1_module.pg_conn import PostgresEngineCreator, psql_insert_copy
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
@@ -16,24 +19,13 @@ logger.setLevel(logging.DEBUG)
 
 
 def main() -> int | None:
-    parser: ArgumentParser = ArgumentParser()
-    parser.add_argument("--type", type=str, default="postgres")
-    parser.add_argument(
-        "--url",
-        type=str,
-        default="https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/yellow_tripdata_2021-01.csv.gz",
-        help="URL to file csv.gz",
-    )
-    args = parser.parse_known_args()
+    parser = create_parser()
+    args: Namespace = parser.parse_args()
 
-    logger.info("Downloading the CSV.GZ file")
-    urllib.request.urlretrieve(args[0].url, "output.csv.gz")  # noqa: S310
-    logger.info("Download complete")
-
-    if args[0].type == "postgres":
+    if args.type == "postgres":
         engine: Engine
         conn_str: str
-        engine, conn_str = PostgresEngineCreator().create_engine(parser)
+        engine, conn_str = PostgresEngineCreator().create_engine(args)
         logger.info("Connected to %s", engine)
         logger.info("Connected to %s", conn_str)
     else:
@@ -42,28 +34,46 @@ def main() -> int | None:
 
     logger.info("Target database is %s", engine)
 
-    logger.info("Reading csv from pyarrow")
-    ops: ReadOptions = ReadOptions(block_size=1000000)
-    arrow_table: CSVStreamingReader = open_csv(
-        "output.csv.gz",
-        read_options=ops,
-    )
-
     logger.info("Start timer")
-    dt = time()
-    logger.info("Writing to database")
+    gt = time()
     first = True
-    for i, batch in enumerate(arrow_table):
-        logger.info("Counter: %i. Time elapsed: %f", i, (time() - dt))
-        df_batch: pl.DataFrame | pl.Series = pl.from_arrow(batch)
+
+    for period in rrule.rrule(
+        rrule.MONTHLY,
+        dtstart=datetime.fromisoformat(args.from_date),
+        until=datetime.fromisoformat(args.until_date),
+    ):
+        logger.info("Start table timer")
+        dt = time()
+        logger.info("Downloading the CSV.GZ file for %s", period)
+
+        url_period: str = args.url.format(
+            year=period.year, month=str(period.month).zfill(2)
+        )
+        urllib.request.urlretrieve(url_period, "output.csv.gz")  # noqa: S310
+        logger.info("Download complete")
+
+        logger.info("Reading the CSV.GZ file")
+        df_batch = pd.read_csv(
+            "output.csv.gz", low_memory=False, encoding="unicode_escape"
+        )
+
         mode: Literal["replace", "append"] = "replace" if first else "append"
+        first = False
+        logger.info("Writing to database")
 
-        if type(df_batch) == pl.DataFrame:
-            df_batch.write_database(
-                "taxi_data", conn_str, if_table_exists=mode, engine="sqlalchemy"
-            )
+        df_batch.to_sql(
+            "fhv_tripdata",
+            con=engine,
+            schema="staging",
+            index=False,
+            if_exists=mode,
+            method=psql_insert_copy,
+        )
 
-    logger.info("End timer")
-    logger.info("Time elapsed: %s", time() - dt)
+        logger.info("Deleting the CSV.GZ file")
+        Path("output.csv.gz").unlink()
+        logger.info("Time elapsed for period %s: %s", period, time() - dt)
 
+    logger.info("Total time elapsed: %s", time() - gt)
     return 0
